@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/gulimall.iml" filepath="$PROJECT_DIR$/.idea/gulimall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimall-common/gulimall-common.iml" filepath="$PROJECT_DIR$/gulimall-common/gulimall-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/gulimall-coupon/gulimall-coupon.iml" filepath="$PROJECT_DIR$/gulimall-coupon/gulimall-coupon.iml" />
       <module fileurl="file://$PROJECT_DIR$/gulimall-member/gulimall-member.iml" filepath="$PROJECT_DIR$/gulimall-member/gulimall-member.iml" />
       <module fileurl="file://$PROJECT_DIR$/gulimall-order/gulimall-order.iml" filepath="$PROJECT_DIR$/gulimall-order/gulimall-order.iml" />
