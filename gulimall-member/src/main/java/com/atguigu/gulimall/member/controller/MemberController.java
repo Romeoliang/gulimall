@@ -31,17 +31,17 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-//    @Autowired
-//    CouponFeignService couponFeignService;
+    @Autowired
+    CouponFeignService couponFeignService;
 
     @RequestMapping("/coupons")
     public R test(){
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setNickname("张三");
 
-//        R membercoupons = couponFeignService.membercoupons();
-//        return R.ok().put("member",memberEntity).put("coupons",membercoupons.get("coupons"));
-        return null;
+        R membercoupons = couponFeignService.membercoupons();
+        return R.ok().put("member",memberEntity).put("coupons",membercoupons.get("coupons"));
+//        return null;
     }
 
 
