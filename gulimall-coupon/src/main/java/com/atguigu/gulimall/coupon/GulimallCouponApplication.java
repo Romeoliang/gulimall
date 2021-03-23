@@ -52,7 +52,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  *
  *
  */
-//@EnableDiscoveryClient
+@EnableDiscoveryClient
 @SpringBootApplication
 @MapperScan("com.atguigu.gulimall.coupon.dao")
 public class GulimallCouponApplication {
