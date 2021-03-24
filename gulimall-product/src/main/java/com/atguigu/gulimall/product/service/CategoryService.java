@@ -33,5 +33,11 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     void updateCascade(CategoryEntity category);
 
+    /**
+     * 递归查询树形结构的数据
+     * @return
+     */
+    List<CategoryEntity> queryListTree();
+
 }
 

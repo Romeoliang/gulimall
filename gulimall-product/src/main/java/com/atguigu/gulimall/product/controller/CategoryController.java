@@ -43,6 +43,16 @@ public class CategoryController {
         return R.ok().put("data", entities);
     }
 
+    /**
+     * 递归查询树形结构的数据
+     */
+
+    @GetMapping("tree")
+    public R queryListTree() {
+        List<CategoryEntity> listTree = categoryService.queryListTree();
+
+        return R.ok().put("listTree",listTree);
+    }
 
     /**
      * 信息

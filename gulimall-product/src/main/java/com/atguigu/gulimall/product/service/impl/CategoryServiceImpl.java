@@ -1,6 +1,8 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,7 +24,7 @@ import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Slf4j
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 
@@ -30,6 +33,28 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     CategoryBrandRelationService categoryBrandRelationService;
+
+
+    @Override
+    public List<CategoryEntity> queryListTree() {
+        List<CategoryEntity> levelOne = baseMapper.selectList(null);
+        //组装父子结构返回
+        List<CategoryEntity> collect = levelOne.stream()
+                .filter(categoryEntity -> categoryEntity.getParentCid() == 0).collect(Collectors.toList());
+
+        List<Integer> list = levelOne.stream().map(CategoryEntity::getCatLevel).collect(Collectors.toList());
+        log.info("catLevelList{}", JSON.toJSONString(list));
+
+        Map<Integer, String> map = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, CategoryEntity::getName, (k1, k2) -> k2));
+        log.info("map{}", JSON.toJSONString(map));
+        Map<Integer, CategoryEntity> collect1 = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, Function.identity(), (k1, k2) -> k2));
+        log.info("转map1{}",JSON.toJSONString(collect1));
+        Map<Integer, CategoryEntity> collec = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, Function.identity(), (k1, k2) -> k1));
+        log.info("转map2{}",JSON.toJSONString(collec));
+        Map<Long, CategoryEntity> collect2 = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatId, Function.identity(), (k1, k2) -> k1));
+        log.info("转map{}",JSON.toJSONString(collect2));
+        return collect;
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
