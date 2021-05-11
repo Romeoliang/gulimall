@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,24 +34,44 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     public List<CategoryEntity> queryListTree() {
-        List<CategoryEntity> levelOne = baseMapper.selectList(null);
+        //查出所有的分类
+        List<CategoryEntity> entities = baseMapper.selectList(null);
         //组装父子结构返回
-        List<CategoryEntity> collect = levelOne.stream()
-                .filter(categoryEntity -> categoryEntity.getParentCid() == 0).collect(Collectors.toList());
 
-        List<Integer> list = levelOne.stream().map(CategoryEntity::getCatLevel).collect(Collectors.toList());
+        //找到所有的一级分类
+        List<CategoryEntity> levelOne = entities.stream()
+                .filter(categoryEntity -> categoryEntity.getParentCid() == 0).map(menu -> {
+                    menu.setBaby(getBabys(menu,entities));
+                    return menu;
+                }).sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ? 0 : menu.getSort()))).collect(Collectors.toList());
+
+        List<Integer> list = entities.stream().map(CategoryEntity::getCatLevel).collect(Collectors.toList());
         log.info("catLevelList{}", JSON.toJSONString(list));
-
-        Map<Integer, String> map = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, CategoryEntity::getName, (k1, k2) -> k2));
+        Map<Integer, String> map = entities.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, CategoryEntity::getName, (k1, k2) -> k2));
         log.info("map{}", JSON.toJSONString(map));
-        Map<Integer, CategoryEntity> collect1 = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, Function.identity(), (k1, k2) -> k2));
+        Map<Integer, CategoryEntity> collect1 = entities.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, Function.identity(), (k1, k2) -> k2));
         log.info("转map1{}",JSON.toJSONString(collect1));
-        Map<Integer, CategoryEntity> collec = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, Function.identity(), (k1, k2) -> k1));
+        Map<Integer, CategoryEntity> collec = entities.stream().collect(Collectors.toMap(CategoryEntity::getCatLevel, Function.identity(), (k1, k2) -> k1));
         log.info("转map2{}",JSON.toJSONString(collec));
-        Map<Long, CategoryEntity> collect2 = levelOne.stream().collect(Collectors.toMap(CategoryEntity::getCatId, Function.identity(), (k1, k2) -> k1));
+        Map<Long, CategoryEntity> collect2 = entities.stream().collect(Collectors.toMap(CategoryEntity::getCatId, Function.identity(), (k1, k2) -> k1));
         log.info("转map{}",JSON.toJSONString(collect2));
-        return collect;
+        return levelOne;
     }
+
+
+    //递归查找所有菜单的子菜单
+    private List<CategoryEntity> getBabys(CategoryEntity root,List<CategoryEntity> all){
+        List<CategoryEntity> babys = all.stream().filter(data -> {
+            return data.getParentCid()== root.getCatId();
+        }).map(data->{
+            //找子菜单
+            data.setBaby(getBabys(data,all));
+            return data;
+        }).sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ? 0 : menu.getSort()))).collect(Collectors.toList());
+        return babys;
+    }
+
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

@@ -70,6 +70,9 @@ public class CategoryEntity implements Serializable {
 	@TableField(exist=false)
 	private List<CategoryEntity> children;
 
+	@TableField(exist = false)
+	private List<CategoryEntity> baby;
+
 
 
 }
